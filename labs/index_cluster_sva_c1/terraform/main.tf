@@ -62,147 +62,125 @@ module "security_group" {
   tags = local.tags
 }
 
-# resource "aws_kms_key" "this" {
-# }
-
-resource "aws_key_pair" "admin_server" {
-  key_name   = var.admin_server_public_ssh_key_name
-  public_key = var.admin_server_public_ssh_key
-}
-
-resource "aws_key_pair" "jump_server" {
-  count = var.jump_server_public_ssh_key != "" ? 0 : 1
-
-  key_name   = var.jump_server_public_ssh_key_name
-  public_key = var.jump_server_public_ssh_key
-}
-
 locals {
   instance_defaults = {
+    create                      = var.jump_server_public_ssh_key != "" ? true : false
     instance_type               = "m5.large"
     availability_zone           = element(module.vpc.azs, 0)
     subnet_id                   = element(module.vpc.private_subnets, 0)
     associate_public_ip_address = false
-    create = var.jump_server_public_ssh_key != "" ? true : false
+    user_data = templatefile("${path.module}/templates/default_user_data.tftpl", { user = var.ec2_username, ssh_authorized_key = var.jump_server_public_ssh_key })
   }
 
   lab_instances = {
-    # idx-1 = {
-    #   private_ip = "10.0.0.11"
-    #   root_block_device = [
-    #     {
-    #       delete_on_termination = true
-    #       encrypted             = true
-    #       # kms_key_id = aws_kms_key.this.arn
-    #       volume_type = "gp3"
-    #       throughput  = 50
-    #       volume_size = 50
-    #     }
-    #   ]
-    # }
-    # idx-2 = {
-    #   private_ip = "10.0.0.12"
-    #   root_block_device = [
-    #     {
-    #       delete_on_termination = true
-    #       encrypted             = true
-    #       # kms_key_id = aws_kms_key.this.arn
-    #       volume_type = "gp3"
-    #       throughput  = 50
-    #       volume_size = 50
-    #     }
-    #   ]
-    # }
-    # idx-3 = {
-    #   private_ip = "10.0.0.13"
-    #   root_block_device = [
-    #     {
-    #       delete_on_termination = true
-    #       encrypted             = true
-    #       # kms_key_id = aws_kms_key.this.arn
-    #       volume_type = "gp3"
-    #       throughput  = 50
-    #       volume_size = 50
-    #     }
-    #   ]
-    # }
-    # sh-1 = {
-    #   private_ip = "10.0.0.31"
-    #   root_block_device = [
-    #     {
-    #       delete_on_termination = true
-    #       encrypted             = true
-    #       # kms_key_id = aws_kms_key.this.arn
-    #       volume_type = "gp3"
-    #       throughput  = 50
-    #       volume_size = 50
-    #     }
-    #   ]
-    # }
-    # cm-1 = {
-    #   private_ip = "10.0.0.21"
-    #   root_block_device = [
-    #     {
-    #       delete_on_termination = true
-    #       encrypted             = true
-    #       # kms_key_id = aws_kms_key.this.arn
-    #       volume_type = "gp3"
-    #       throughput  = 50
-    #       volume_size = 50
-    #     }
-    #   ]
-    # }
     utl-1 = {
       private_ip = "10.0.0.22"
       root_block_device = [
         {
           delete_on_termination = true
           encrypted             = true
-          # kms_key_id = aws_kms_key.this.arn
           volume_type = "gp3"
-          throughput  = 50
+          throughput  = 125
           volume_size = 50
         }
       ]
     }
-    # fwd-1 = {
-    #   private_ip = "10.0.0.41"
-    #   root_block_device = [
-    #     {
-    #       delete_on_termination = true
-    #       encrypted             = true
-    #       # kms_key_id = aws_kms_key.this.arn
-    #       volume_type = "gp3"
-    #       throughput  = 50
-    #       volume_size = 50
-    #     }
-    #   ]
-    # }
-    # fwd-2 = {
-    #   private_ip = "10.0.0.42"
-    #   root_block_device = [
-    #     {
-    #       delete_on_termination = true
-    #       encrypted             = true
-    #       # kms_key_id = aws_kms_key.this.arn
-    #       volume_type = "gp3"
-    #       throughput  = 50
-    #       volume_size = 50
-    #     }
-    #   ]
-    # }
-    jump = {
-      private_ip                  = "10.0.3.10"
-      associate_public_ip_address = true
-      subnet_id                   = element(module.vpc.public_subnets, 0)
-      key_name = aws_key_pair.dan.key_name
+    cm-1 = {
+      private_ip = "10.0.0.21"
       root_block_device = [
         {
           delete_on_termination = true
           encrypted             = true
-          # kms_key_id = aws_kms_key.this.arn
           volume_type = "gp3"
-          throughput  = 50
+          throughput  = 125
+          volume_size = 50
+        }
+      ]
+    }
+    idx-1 = {
+      private_ip = "10.0.0.11"
+      root_block_device = [
+        {
+          delete_on_termination = true
+          encrypted             = true
+          volume_type = "gp3"
+          throughput  = 125
+          volume_size = 50
+        }
+      ]
+    }
+    idx-2 = {
+      private_ip = "10.0.0.12"
+      root_block_device = [
+        {
+          delete_on_termination = true
+          encrypted             = true
+          volume_type = "gp3"
+          throughput  = 125
+          volume_size = 50
+        }
+      ]
+    }
+    idx-3 = {
+      private_ip = "10.0.0.13"
+      root_block_device = [
+        {
+          delete_on_termination = true
+          encrypted             = true
+          volume_type = "gp3"
+          throughput  = 125
+          volume_size = 50
+        }
+      ]
+    }
+    sh-1 = {
+      private_ip = "10.0.0.31"
+      root_block_device = [
+        {
+          delete_on_termination = true
+          encrypted             = true
+          volume_type = "gp3"
+          throughput  = 125
+          volume_size = 50
+        }
+      ]
+    }
+    fwd-1 = {
+      private_ip = "10.0.0.41"
+      root_block_device = [
+        {
+          delete_on_termination = true
+          encrypted             = true
+          volume_type = "gp3"
+          throughput  = 125
+          volume_size = 50
+        }
+      ]
+    }
+    fwd-2 = {
+      private_ip = "10.0.0.42"
+      root_block_device = [
+        {
+          delete_on_termination = true
+          encrypted             = true
+          volume_type = "gp3"
+          throughput  = 125
+          volume_size = 50
+        }
+      ]
+    }
+    jump = {
+      create                      = true
+      private_ip                  = "10.0.3.10"
+      associate_public_ip_address = true
+      subnet_id                   = element(module.vpc.public_subnets, 0)
+      user_data = templatefile("${path.module}/templates/jump_server_user_data.tftpl", { user = var.ec2_username, ssh_authorized_keys = var.admin_computer_public_ssh_keys })
+      root_block_device = [
+        {
+          delete_on_termination = true
+          encrypted             = true
+          volume_type = "gp3"
+          throughput  = 125
           volume_size = 50
         }
       ]
@@ -218,18 +196,19 @@ module "ec2_splunk_lab" {
 
   name = "${local.name}-${each.key}"
 
-  create = lookup(each.value, "create", false)
+  create = lookup(each.value, "create", local.instance_defaults.create)
 
   ami                         = data.aws_ami.amazon_linux.id
-  instance_type               = lookup(each.value, "instance_type", local.instance_defaults.instance_type)                             #each.value.instance_type ? each.value.instance_type : local.instance_defaults.instance_type
-  availability_zone           = lookup(each.value, "availability_zone", local.instance_defaults.availability_zone)                     #each.value.availability_zone ? each.value.availability_zone : local.instance_defaults.availability_zone
-  subnet_id                   = lookup(each.value, "subnet_id", local.instance_defaults.subnet_id)                                     #each.value.subnet_id ? each.value.subnet_id : local.instance_defaults.subnet_id
-  associate_public_ip_address = lookup(each.value, "associate_public_ip_address", local.instance_defaults.associate_public_ip_address) #each.value.associate_public_ip_address ? each.value.associate_public_ip_address : local.instance_defaults.associate_public_ip_address
+  instance_type               = lookup(each.value, "instance_type", local.instance_defaults.instance_type)
+  availability_zone           = lookup(each.value, "availability_zone", local.instance_defaults.availability_zone)
+  subnet_id                   = lookup(each.value, "subnet_id", local.instance_defaults.subnet_id)
+  associate_public_ip_address = lookup(each.value, "associate_public_ip_address", local.instance_defaults.associate_public_ip_address)
+  private_ip                  = lookup(each.value, "private_ip", null)
   vpc_security_group_ids      = [module.security_group.security_group_id]
-  key_name                    = lookup(each.value, "key_name", local.instance_defaults.key_name)
+  user_data = lookup(each.value, "user_data", local.instance_defaults.user_data)
 
   enable_volume_tags = false
   root_block_device  = lookup(each.value, "root_block_device", [])
 
-  tags = local.tags
+  tags = merge(local.tags, { Name = "${local.name}-${each.key}" })
 }

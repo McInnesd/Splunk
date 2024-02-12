@@ -1,0 +1,12 @@
+#cloud-config 
+users:
+  - name: ${user}
+    ssh_authorized_keys:
+%{ for authorized_key in ssh_authorized_keys ~}
+      - ${authorized_key}
+%{ endfor ~}
+    sudo:  ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+runcmd: 
+  - [ssh-keygen, -f, /home/${user}/.ssh/id_rsa, -q, -N, '', -C, ${user}@jump-server]
+  - [chown, -R, '${user}:', /home/${user}/.ssh]
