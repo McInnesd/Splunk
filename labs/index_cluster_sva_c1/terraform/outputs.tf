@@ -11,5 +11,5 @@ output "ec2_username" {
 }
 
 output "ssh_command" {
-  value = "ssh ${var.ec2_username}@${module.ec2_splunk_lab["jump"].public_ip} -i ~/.ssh/id_rsa"
+  value = "ssh ${var.ec2_username}@${module.ec2_splunk_lab["jump"].public_ip} -i ~/.ssh/id_rsa 'cat .ssh/id_rsa.pub'"
 }

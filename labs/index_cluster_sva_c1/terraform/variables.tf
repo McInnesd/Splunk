@@ -8,11 +8,11 @@ variable "ec2_username" {
   type    = string
 }
 
-variable "admin_computer_public_ssh_keys" {
+variable "admin_computer_public_keys" {
   type = list(string)
 }
 
-variable "jump_server_public_ssh_key" {
+variable "jump_server_public_key" {
   type    = string
   default = ""
 }

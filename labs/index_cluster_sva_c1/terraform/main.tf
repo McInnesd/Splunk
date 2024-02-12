@@ -64,12 +64,12 @@ module "security_group" {
 
 locals {
   instance_defaults = {
-    create                      = var.jump_server_public_ssh_key != "" ? true : false
+    create                      = var.jump_server_public_key != "" ? true : false
     instance_type               = "m5.large"
     availability_zone           = element(module.vpc.azs, 0)
     subnet_id                   = element(module.vpc.private_subnets, 0)
     associate_public_ip_address = false
-    user_data = templatefile("${path.module}/templates/default_user_data.tftpl", { user = var.ec2_username, ssh_authorized_key = var.jump_server_public_ssh_key })
+    user_data                   = templatefile("${path.module}/templates/default_user_data.tftpl", { user = var.ec2_username, ssh_authorized_key = var.jump_server_public_key })
   }
 
   lab_instances = {
@@ -79,9 +79,9 @@ locals {
         {
           delete_on_termination = true
           encrypted             = true
-          volume_type = "gp3"
-          throughput  = 125
-          volume_size = 50
+          volume_type           = "gp3"
+          throughput            = 125
+          volume_size           = 50
         }
       ]
     }
@@ -174,14 +174,14 @@ locals {
       private_ip                  = "10.0.3.10"
       associate_public_ip_address = true
       subnet_id                   = element(module.vpc.public_subnets, 0)
-      user_data = templatefile("${path.module}/templates/jump_server_user_data.tftpl", { user = var.ec2_username, ssh_authorized_keys = var.admin_computer_public_ssh_keys })
+      user_data                   = templatefile("${path.module}/templates/jump_server_user_data.tftpl", { user = var.ec2_username, ssh_authorized_keys = var.admin_computer_public_keys })
       root_block_device = [
         {
           delete_on_termination = true
           encrypted             = true
-          volume_type = "gp3"
-          throughput  = 125
-          volume_size = 50
+          volume_type           = "gp3"
+          throughput            = 125
+          volume_size           = 50
         }
       ]
     }
@@ -198,14 +198,14 @@ module "ec2_splunk_lab" {
 
   create = lookup(each.value, "create", local.instance_defaults.create)
 
-  ami                         = data.aws_ami.amazon_linux.id
+  ami                         = data.aws_ami.amazon_linux_23.id
   instance_type               = lookup(each.value, "instance_type", local.instance_defaults.instance_type)
   availability_zone           = lookup(each.value, "availability_zone", local.instance_defaults.availability_zone)
   subnet_id                   = lookup(each.value, "subnet_id", local.instance_defaults.subnet_id)
   associate_public_ip_address = lookup(each.value, "associate_public_ip_address", local.instance_defaults.associate_public_ip_address)
   private_ip                  = lookup(each.value, "private_ip", null)
   vpc_security_group_ids      = [module.security_group.security_group_id]
-  user_data = lookup(each.value, "user_data", local.instance_defaults.user_data)
+  user_data                   = lookup(each.value, "user_data", local.instance_defaults.user_data)
 
   enable_volume_tags = false
   root_block_device  = lookup(each.value, "root_block_device", [])
