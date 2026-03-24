@@ -84,7 +84,7 @@ try {
     Write-Log -LogLevel "INFO" -Message "Upgrading Splunk Forwarder from $CurrentSplunkVersion to $NewSplunkVersion"
 } catch {
     Write-Log -LogLevel "INFO" -LogFilePath "$PSScriptRoot\splunk_install.log" -Message "Splunk Forwarder not found. This is a clean install"
-    $proc = Start-Process -FilePath "C:\Windows\system32\msiexec.exe" -Wait -PassThru -NoNewWindow -ArgumentList "/i `"$SplunkForwarderMSI`" AGREETOLICENSE=Yes /q"
+    $proc = Start-Process -FilePath "C:\Windows\system32\msiexec.exe" -Wait -PassThru -NoNewWindow -ArgumentList "/i `"$SplunkForwarderMSI`" AGREETOLICENSE=Yes LAUNCHSPLUNK=0 /q"
     if ($proc.ExitCode -ne 0) {
         throw "MSI install failed with exit code $($proc.ExitCode)"
     }
@@ -111,7 +111,7 @@ foreach ($ConfFile in $LocalConfToDelete){
 
 if (!$CleanInstall) {
     Write-Log -LogLevel "INFO" -Message "Update process start upgrade splunk forwarder"
-    $proc = Start-Process -FilePath "C:\Windows\system32\msiexec.exe" -Wait -PassThru -NoNewWindow -ArgumentList "/i `"$SplunkForwarderMSI`" AGREETOLICENSE=Yes /q"
+    $proc = Start-Process -FilePath "C:\Windows\system32\msiexec.exe" -Wait -PassThru -NoNewWindow -ArgumentList "/i `"$SplunkForwarderMSI`" AGREETOLICENSE=Yes LAUNCHSPLUNK=0 /q"
     if ($proc.ExitCode -ne 0) {
         throw "MSI install failed with exit code $($proc.ExitCode)"
     }
