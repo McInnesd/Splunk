@@ -71,7 +71,7 @@ if ($SplunkForwarderMSI.Split("\")[-1] -match $SplunkVersionRegex) {
 
 
 try {
-    $SplunkServiceBinPath           = (Get-Service -Name SplunkForwarder).BinaryPathName
+    $SplunkServiceBinPath           = (Get-CimInstance Win32_Service -Filter "Name='SplunkForwarder'").PathName
     $SplunkdPath                    = ($SplunkServiceBinPath -replace '"','') -replace " service$", ""
     $SplunkHomePath                 = $SplunkdPath.Replace("\bin\splunkd.exe","")
     [version]$CurrentSplunkVersion  = (Get-ItemProperty $SplunkdPath).VersionInfo.FileVersion
